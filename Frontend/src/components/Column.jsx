@@ -1,31 +1,58 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Card from './Card';
 import AddCard from './AddCard';
 import DropIndicator from './DropIndicator';
 import { FaTrash } from 'react-icons/fa';
+import axios from 'axios';
 
 const Column = ({ title, headingColor, cards, column, setCards }) => {
     const [active, setActive] = useState(false);
-  
+    const [filteredCards,setFilteredCards] = useState([])
+
+    const getColumnCards= async ()=>{
+      try {
+        await axios.get(`/api/column/${column}`).then((res)=>{setFilteredCards(res.data)}).catch(error=>console.log(error))
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+
+    useEffect(()=>{
+      
+      getColumnCards()
+    },[cards])
     const handleDragStart = (e, card) => {
+      e.dataTransfer.setData("cardId1", card._id);
       e.dataTransfer.setData("cardId", card.id);
+     
     };
   
-    const handleDragEnd = (e) => {
+    const handleDragEnd = async (e) => {
+      console.log(e.dataTransfer)
       const cardId = e.dataTransfer.getData("cardId");
-  
+      const cardId1 = e.dataTransfer.getData("cardId1");
+      console.log(cardId,"this is from card")
       setActive(false);
       clearHighlights();
-  
+      try {
+        await axios.put(`/api/updatecolumn/${cardId1}/${column}`).then(()=>{
+          getColumnCards()
+          })
+      } catch (error) {
+        console.log(error)
+      }
+      
       const indicators = getIndicators();
       const { element } = getNearestIndicator(e, indicators);
   
       const before = element.dataset.before || "-1";
-  
+     
       if (before !== cardId) {
         let copy = [...cards];
-  
+       
         let cardToTransfer = copy.find((c) => c.id === cardId);
+        console.log(cardToTransfer,"cared to transfer")
         if (!cardToTransfer) return;
         cardToTransfer = { ...cardToTransfer, column };
   
@@ -41,7 +68,7 @@ const Column = ({ title, headingColor, cards, column, setCards }) => {
   
           copy.splice(insertAtIndex, 0, cardToTransfer);
         }
-  
+        
         setCards(copy);
       }
     };
@@ -49,7 +76,6 @@ const Column = ({ title, headingColor, cards, column, setCards }) => {
     const handleDragOver = (e) => {
       e.preventDefault();
       highlightIndicator(e);
-  
       setActive(true);
     };
   
@@ -104,13 +130,21 @@ const Column = ({ title, headingColor, cards, column, setCards }) => {
       setActive(false);
     };
 
-    const sectionDelete = (column)=>{
-        const newCards = cards.filter((card)=>card.column !== column)
+    const sectionDelete = async (column)=>{
+      try {
+        await axios.delete(`/api/deletecolumn/${column}`).then(()=>{
+          getColumnCards()
+          })
+          const newCards = cards.filter((card)=>card.column !== column)
         setCards(newCards)
+      } catch (error) {
+        console.log(error)
+      }
+        
     }
   
-    const filteredCards = cards.filter((c) => c.column === column);
-    const excludedTitles = ["TO DO", "PROCESS", "REVIEW"]
+    // const filteredCards = cards.filter((c) => c.column === column);
+    const excludedTitles = ["To Do", "In Progress", "Review"]
     return (
       <div className="w-60 shrink-0 shadow-sm border pt-3 rounded-sm">
         <div className="mb-3 px-3 flex items-center justify-between">
@@ -131,9 +165,8 @@ const Column = ({ title, headingColor, cards, column, setCards }) => {
           }`}
         >
           {filteredCards.map((c) => {
-            console.log(c)
             if(!c.formData)return
-            return <Card key={c.id} {...c} handleDragStart={handleDragStart} />;
+            return <Card key={c.id} {...c} cards={cards} getColumnCards={getColumnCards} setCards={setCards} handleDragStart={handleDragStart} />;
           })}
           <DropIndicator beforeId={null} column={column} />
           <AddCard column={column} setCards={setCards} />

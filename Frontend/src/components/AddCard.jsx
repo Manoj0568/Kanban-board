@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion';
 import { FiPlus } from 'react-icons/fi';
 import DatePicker from 'tailwind-datepicker-react';
+import axios from 'axios';
 const AddCard = ({ column, setCards }) => {
     const [formData, setFormData] = useState({
         taskname:"",
@@ -11,14 +12,17 @@ const AddCard = ({ column, setCards }) => {
     });
     const [adding, setAdding] = useState(false);
   
-    const handleSubmit = (e) => {
+    const handleSubmit = async(e) => {
       e.preventDefault();
   
       const newCard = {
         column,
         formData,
         id: Math.random().toString(),
+        image:`https://i.pravatar.cc/150?u=${Math.floor(Math.random().toString() * 100)}`
       };
+      await axios.post('/api/createcard',newCard).then((res)=>console.log(res)).catch(error=>console.log(error))
+
       console.log(newCard)
       setCards((pv) => [...pv, newCard]);
       setFormData(

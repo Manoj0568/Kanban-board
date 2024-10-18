@@ -19,23 +19,28 @@ const DisplayDate = ({ date }) => {
 
     let displayText;
     let textColor;
+    let text;
 
     if (parsedDate.toDateString() === yesterday.toDateString()) {
         displayText = 'Yesterday';
         textColor = 'text-red-600';
+        text = 'text-base'
     } else if (parsedDate.toDateString() === today.toDateString()) {
         displayText = 'Today';
         textColor = 'text-black';
+        text = 'text-base'
     } else if (parsedDate.toDateString() === tomorrow.toDateString()) {
         displayText = 'Tomorrow';
         textColor = 'text-green-600';
+        text = 'text-base'
     } else {
         displayText = formatDate(parsedDate);
         textColor = 'text-gray-600';
+        text = 'text-xs'
     }
 
     return (
-        <p className={`${textColor} text-base font-semibold`}>
+        <p className={`${textColor, text} font-semibold`}>
             {displayText}
         </p>
     );

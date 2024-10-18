@@ -1,14 +1,25 @@
 import React, { useEffect, useState } from 'react'
 import Column from './Column';
 import AddSection from './AddSection';
+import axios from 'axios';
 const Board = () => {
   const [cards, setCards] = useState([]);
-  let uniqueColumns = [...new Set(cards.map(card => card.column))]
+  // let uniqueColumns = [...new Set(cards.map(card => card.column))]
+  const [uniqueColumns,setUniqueColumns] = useState([])
+  const getUniqueColumn= async ()=>{
+    try {
+      await axios.get("/api/uniquecards").then((res)=>{setUniqueColumns(res.data)}).catch(error=>console.log(error))
+      await axios.get("/api/getcards").then((res)=>{setCards(res.data)}).catch(error=>console.log(error))
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
-  // useEffect(()=>{
-  //   uniqueColumns = [...new Set(cards.map(card => card.column))]
-  // },[cards])
-  console.log(uniqueColumns)
+  useEffect(()=>{
+    
+    getUniqueColumn()
+  },[cards.length])
+ 
   return (
     <div className="flex h-full w-full gap-3 overflow-scroll p-12">
       {uniqueColumns.length>0 ?(uniqueColumns.map((column)=>{

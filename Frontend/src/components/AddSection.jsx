@@ -1,19 +1,22 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion';
 import { FiPlus } from 'react-icons/fi';
+import axios from 'axios';
 const AddSection = ({setCards }) => {
     const [text, setText] = useState("");
     const [adding, setAdding] = useState(false);
   
-    const handleSubmit = (e) => {
+    const handleSubmit = async(e) => {
       e.preventDefault();
   
       if (!text.trim().length) return;
   
       const newCard = {
-        column: text
+        column: text,
+        id: Math.random().toString(),
       };
-  
+      await axios.post('/api/createcard',newCard).then((res)=>console.log(res)).catch(error=>console.log(error))
+
       setCards((pv) => [...pv, newCard]);
   
       setAdding(false);
