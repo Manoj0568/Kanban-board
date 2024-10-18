@@ -1,4 +1,4 @@
-import { Input } from '@mui/material';
+
 import React from 'react'
 import { FaApple, FaSearch } from "react-icons/fa";
 import { IoMdSettings } from "react-icons/io";
@@ -15,7 +15,7 @@ const Header = () => {
        </div>
        <div className='flex flex-row gap-3 items-center'>
          <div className='relative'>
-         <Input className='border rounded-md pl-3' placeholder='Search'/>
+         <input className='border rounded-md pl-3' placeholder='Search'/>
          <FaSearch className='absolute right-3 font-light text-neutral-500 top-2 text-xl'/>
          </div>
          <div className='bg-slate-100 shadow-sm text-2xl p-2 text-neutral-400 rounded-md'><GoGraph/></div>
